@@ -17,6 +17,7 @@ export interface KaigoApiProps {
   appEnv: string;
   userPool: UserPool;
   openAiApiKeySecretArn?: string | null;
+  systemPromptSecretArn?: string | null;
   openAiModel?: string | null;
   allowedOrigins?: string[];
   logLevel?: string;
@@ -46,6 +47,7 @@ export class KaigoApi extends Construct {
       memorySize: 256,
       environment: {
         OPENAI_API_KEY_SECRET_ARN: props.openAiApiKeySecretArn ?? '',
+        KAIGO_SYSTEM_PROMPT_SECRET_ARN: props.systemPromptSecretArn ?? '',
         OPENAI_MODEL: props.openAiModel ?? '',
         LOG_LEVEL: props.logLevel ?? 'INFO',
       },
@@ -58,6 +60,15 @@ export class KaigoApi extends Construct {
         props.openAiApiKeySecretArn,
       );
       openAiApiKeySecret.grantRead(chatFunction);
+    }
+
+    if (props.systemPromptSecretArn) {
+      const systemPromptSecret = Secret.fromSecretCompleteArn(
+        this,
+        'SystemPromptSecret',
+        props.systemPromptSecretArn,
+      );
+      systemPromptSecret.grantRead(chatFunction);
     }
 
     const api = new RestApi(this, 'Api', {

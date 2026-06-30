@@ -136,6 +136,7 @@ export class GenerativeAiUseCasesStack extends Stack {
           appEnv: params.appEnv,
           userPool: auth.userPool,
           openAiApiKeySecretArn: params.kaigoApiOpenAiSecretArn,
+          systemPromptSecretArn: params.kaigoApiSystemPromptSecretArn,
           openAiModel: params.kaigoApiOpenAiModel,
           logLevel: params.logLevel,
         })

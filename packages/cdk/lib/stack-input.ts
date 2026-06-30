@@ -121,6 +121,7 @@ export const stackInputSchema = z
     chatHistoryMode: z.string().default('enabled'),
     kaigoApiEnabled: z.boolean().default(false),
     kaigoApiOpenAiSecretArn: z.string().default(''),
+    kaigoApiSystemPromptSecretArn: z.string().default(''),
     kaigoApiOpenAiModel: z.string().default(''),
 
     // API
