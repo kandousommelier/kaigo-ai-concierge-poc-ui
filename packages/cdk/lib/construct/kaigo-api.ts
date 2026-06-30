@@ -4,6 +4,7 @@ import {
   CognitoUserPoolsAuthorizer,
   Cors,
   LambdaIntegration,
+  ResponseType,
   RestApi,
 } from 'aws-cdk-lib/aws-apigateway';
 import { UserPool } from 'aws-cdk-lib/aws-cognito';
@@ -69,6 +70,23 @@ export class KaigoApi extends Construct {
         allowMethods: ['OPTIONS', 'POST'],
         allowHeaders: Cors.DEFAULT_HEADERS,
       },
+    });
+
+    const gatewayResponseHeaders = {
+      'Access-Control-Allow-Origin': "'*'",
+      'Access-Control-Allow-Headers':
+        "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+      'Access-Control-Allow-Methods': "'OPTIONS,POST'",
+    };
+
+    api.addGatewayResponse('Api4XX', {
+      type: ResponseType.DEFAULT_4XX,
+      responseHeaders: gatewayResponseHeaders,
+    });
+
+    api.addGatewayResponse('Api5XX', {
+      type: ResponseType.DEFAULT_5XX,
+      responseHeaders: gatewayResponseHeaders,
     });
 
     const lambdaIntegration = new LambdaIntegration(chatFunction);
