@@ -15,6 +15,8 @@ import {
 import { genUApi } from '@/lib/fetcher';
 import { decomposeId } from '@/utils/decomposeId';
 
+type AiProvider = 'bedrock' | 'kaigo_api';
+
 export const createChat = async () => {
   const res = await genUApi.post<CreateChatResponse>('chats', {});
   return res.data;
@@ -43,7 +45,22 @@ export const predict = async (req: PredictRequest): Promise<string> => {
   return res.data;
 };
 
+const getAiProvider = (): AiProvider => {
+  const provider = import.meta.env.VITE_APP_AI_PROVIDER?.trim().toLowerCase();
+  return provider === 'kaigo_api' ? 'kaigo_api' : 'bedrock';
+};
+
 export async function* predictStream(req: PredictRequest) {
+  if (getAiProvider() === 'kaigo_api') {
+    throw new Error(
+      'kaigo_api provider is not implemented yet. OpenAI GPTへの実接続は、API仕様、認証方式、ログ保存方針、Secrets Manager管理が確定してから実装してください。',
+    );
+  }
+
+  yield* predictStreamWithBedrock(req);
+}
+
+async function* predictStreamWithBedrock(req: PredictRequest) {
   const token = (await fetchAuthSession()).tokens?.idToken?.toString();
   if (!token) {
     throw new Error('認証されていません。');
