@@ -10,6 +10,7 @@ import {
   KAIGO_AI_RELEASE_PAUSED_MESSAGE,
   KAIGO_EXAMPLE_PROMPT_CATEGORIES,
   KAIGO_EXAMPLE_PROMPTS,
+  KAIGO_INTENDED_USE_TEXT,
   KAIGO_REASK_PROMPTS,
   KAIGO_RECOMMENDED_USAGE_STEPS,
   KAIGO_SERVICE_NAME,
@@ -61,6 +62,9 @@ export const LandingPage = () => {
           </h2>
           <p className='mt-4 max-w-4xl break-words text-std-18N-160 text-solid-gray-800 [overflow-wrap:anywhere]'>
             {KAIGO_TOP_DESCRIPTION}
+          </p>
+          <p className='mt-3 max-w-4xl break-words text-std-16N-170 text-solid-gray-800 [overflow-wrap:anywhere]'>
+            {KAIGO_INTENDED_USE_TEXT}
           </p>
           {KAIGO_AI_RELEASE_PAUSED && (
             <div className='mt-6 rounded-8 border border-solid-gray-420 bg-solid-gray-50 p-4 text-solid-gray-800'>

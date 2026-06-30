@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/dads/Button';
 import { List } from '@/components/ui/dads/List';
 import {
   KAIGO_ANSWER_POSITION_TEXT,
+  KAIGO_INTENDED_USE_TEXT,
   KAIGO_LOGIN_NOTES,
   KAIGO_PROHIBITED_INPUT_TEXT,
   KAIGO_SERVICE_NAME,
@@ -34,6 +35,10 @@ export const ChatNotificationDialog = (props: Props) => {
               {KAIGO_SERVICE_NAME}は、
               {KAIGO_TOP_DESCRIPTION.replace('介護現場AIコンシェルジュは、', '')}
             </p>
+            <div>
+              <h3 className='mb-2 text-std-20B-150'>利用目的</h3>
+              <p>{KAIGO_INTENDED_USE_TEXT}</p>
+            </div>
             <div>
               <h3 className='mb-2 text-std-20B-150'>入力してはいけないこと</h3>
               <p>{KAIGO_PROHIBITED_INPUT_TEXT}</p>

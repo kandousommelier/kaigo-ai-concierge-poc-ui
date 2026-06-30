@@ -30,6 +30,9 @@ export const KAIGO_LOGIN_NOTES = [
 export const KAIGO_TOP_DESCRIPTION =
   '介護現場AIコンシェルジュは、介護現場の生産性向上、ICT活用、業務改善について、相談や壁打ちができるAI体験環境です。「何から始めればよいか分からない」「職員にどう説明すればよいか」「チェックリストや説明文を作りたい」といった場面で使えます。';
 
+export const KAIGO_INTENDED_USE_TEXT =
+  '本AIは、介護現場の施策検討や業務改善の整理にご活用いただくためのものです。一般的なAIチャットのような自由利用は想定しておりませんので、ご注意ください。';
+
 export const KAIGO_EXAMPLE_PROMPTS = [
   `【スタンダード提案モード】
 展示会で見守り機器を見て、補助金が使えるなら申請したいです。

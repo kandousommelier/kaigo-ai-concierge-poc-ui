@@ -114,10 +114,6 @@ export const AssistantMessage = ({
               <Markdown prefix={`${idx}`}>{typingTextOutput}</Markdown>
             </div>
             {loading && <ProgressIndicator className='my-0.5' />}
-
-            <div className='mt-2 text-right text-std-16N-175 text-solid-gray-536 lg:mb-0'>
-              {chatContent.llmType}
-            </div>
           </div>
         </div>
 
