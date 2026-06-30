@@ -1,5 +1,7 @@
 // サービス名称
 export const APP_TITLE = '介護現場AIコンシェルジュ';
+export const FOOTER_BRAND_NAME = APP_TITLE;
+export const FOOTER_COPYRIGHT = `© 2026 ${FOOTER_BRAND_NAME}`;
 
 export const EXAPP_STATUS_OPTIONS = [
   { value: 'draft', label: '下書き' },
