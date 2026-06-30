@@ -4,6 +4,7 @@ export * from './bedrock-inference-profiles';
 export * from './common-web-acl';
 export * from './database';
 export * from './guardrail';
+export * from './kaigo-api';
 export * from './logging';
 export * from './monitoring';
 export * from './team-access-control';

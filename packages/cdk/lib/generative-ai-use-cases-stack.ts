@@ -13,6 +13,7 @@ import {
   BedrockInferenceProfiles,
   CommonWebAcl,
   Database,
+  KaigoApi,
   Monitoring,
   Transcribe,
   Web,
@@ -129,6 +130,16 @@ export class GenerativeAiUseCasesStack extends Stack {
     api.predictStreamFunction.grantInvoke(auth.systemAdminRole);
     api.predictStreamFunction.grantInvoke(auth.teamAdminRole);
     api.predictStreamFunction.grantInvoke(auth.userRole);
+
+    const kaigoApi = params.kaigoApiEnabled
+      ? new KaigoApi(this, 'KaigoApi', {
+          appEnv: params.appEnv,
+          userPool: auth.userPool,
+          openAiApiKeySecretArn: params.kaigoApiOpenAiSecretArn,
+          openAiModel: params.kaigoApiOpenAiModel,
+          logLevel: params.logLevel,
+        })
+      : undefined;
 
     /***
      * GenerativeA IUseCasesStackのリソース数が上限を超えてしまうため、Construct から NestedStackに切り出す
@@ -270,6 +281,12 @@ export class GenerativeAiUseCasesStack extends Stack {
         resourceArn: teamAccessControl.api.deploymentStage.stageArn,
         webAclArn: regionalWaf.webAclArn,
       });
+      if (kaigoApi) {
+        new CfnWebACLAssociation(this, 'KaigoApiWafAssociation', {
+          resourceArn: kaigoApi.api.deploymentStage.stageArn,
+          webAclArn: regionalWaf.webAclArn,
+        });
+      }
     }
 
     // Web Frontend
@@ -289,6 +306,7 @@ export class GenerativeAiUseCasesStack extends Stack {
         params.samlCognitoFederatedIdentityAdditionalProviderNames,
       // Backend
       apiEndpointUrl: api.api.url,
+      kaigoApiEndpointUrl: kaigoApi?.apiEndpointUrl ?? '',
       predictStreamFunctionArn: api.predictStreamFunction.functionArn,
       webAclId: props.webAclId,
       modelRegion: api.modelRegion,
@@ -457,6 +475,16 @@ export class GenerativeAiUseCasesStack extends Stack {
     new CfnOutput(this, 'PredictStreamFunctionArn', {
       value: api.predictStreamFunction.functionArn,
     });
+
+    new CfnOutput(this, 'KaigoApiEnabled', {
+      value: params.kaigoApiEnabled.toString(),
+    });
+
+    if (kaigoApi) {
+      new CfnOutput(this, 'KaigoApiEndpoint', {
+        value: kaigoApi.apiEndpointUrl,
+      });
+    }
 
     new CfnOutput(this, 'SelfSignUpEnabled', {
       value: params.selfSignUpEnabled.toString(),

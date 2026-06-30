@@ -31,6 +31,7 @@ export interface WebProps {
   appEnv: string;
   apiEndpointUrl: string;
   teamAccessControlApiEndpointUrl: string;
+  kaigoApiEndpointUrl?: string;
   userPoolId: string;
   userPoolClientId: string;
   idPoolId: string;
@@ -323,6 +324,7 @@ function handler(event) {
         VITE_APP_ENV: props.appEnv,
         VITE_APP_API_ENDPOINT: props.apiEndpointUrl,
         VITE_APP_TEAM_ACCESS_CONTROL_API_ENDPOINT: props.teamAccessControlApiEndpointUrl,
+        VITE_APP_KAIGO_API_ENDPOINT: props.kaigoApiEndpointUrl ?? '',
         VITE_APP_REGION: Stack.of(this).region,
         VITE_APP_USER_POOL_ID: props.userPoolId,
         VITE_APP_USER_POOL_CLIENT_ID: props.userPoolClientId,

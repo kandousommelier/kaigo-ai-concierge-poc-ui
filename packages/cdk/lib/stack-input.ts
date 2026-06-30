@@ -119,6 +119,9 @@ export const stackInputSchema = z
     hideModelIdsFromUsers: z.boolean().default(true),
     aiProvider: z.string().default('bedrock'),
     chatHistoryMode: z.string().default('enabled'),
+    kaigoApiEnabled: z.boolean().default(false),
+    kaigoApiOpenAiSecretArn: z.string().default(''),
+    kaigoApiOpenAiModel: z.string().default(''),
 
     // API
     modelRegion: z.string().default('ap-northeast-1'),
