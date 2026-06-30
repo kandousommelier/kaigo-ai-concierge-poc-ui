@@ -469,6 +469,7 @@ export const selfHostingKaigoPocParams: Partial<StackInput> = {
   kaigoAiReleasePaused: true,
   hideModelIdsFromUsers: true,
   aiProvider: 'bedrock',
+  chatHistoryMode: 'disabled',
 
   modelRegion: 'ap-northeast-1',
   monitoring: true,

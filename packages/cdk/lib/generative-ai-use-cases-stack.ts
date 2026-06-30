@@ -303,6 +303,7 @@ export class GenerativeAiUseCasesStack extends Stack {
       kaigoAiReleasePaused: params.kaigoAiReleasePaused,
       hideModelIdsFromUsers: params.hideModelIdsFromUsers,
       aiProvider: params.aiProvider,
+      chatHistoryMode: params.chatHistoryMode,
       // Custom Domain
       cert: props.cert,
       hostName: params.hostName,

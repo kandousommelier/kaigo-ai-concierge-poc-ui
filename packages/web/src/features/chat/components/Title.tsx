@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip
 import { DialogConfirmDeleteChat } from '@/features/chat/components/DialogConfirmDeleteChat';
 import { useChat } from '@/hooks/useChat';
 import { useChatList } from '@/hooks/useChatList';
+import { isChatHistoryDisabled } from '@/lib/chatHistoryMode';
 import { focus } from '@/utils/focus';
 
 type Props = {
@@ -92,7 +93,7 @@ export const Title = (props: Props) => {
           <h1 className='flex items-center justify-start text-std-20B-150 h-min min-h-9 text-pretty lg:text-std-24B-150 print:visible print:my-5 print:h-min'>
             {title}
           </h1>
-          {!isEmpty && !loadingMessages && chatId && (
+          {!isChatHistoryDisabled && !isEmpty && !loadingMessages && chatId && (
             <div className='group relative ml-1 flex-none mt-0.5'>
               <Menu>
                 <Tooltip placement='bottom'>

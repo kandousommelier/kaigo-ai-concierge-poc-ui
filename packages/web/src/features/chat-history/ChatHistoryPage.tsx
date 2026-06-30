@@ -7,6 +7,7 @@ import { SearchIcon } from '@/components/ui/icons/SearchIcon';
 import { APP_TITLE } from '@/constants';
 import { ChatList } from '@/features/chat-history/components/ChatList';
 import { LayoutBody } from '@/layout/LayoutBody';
+import { isChatHistoryDisabled } from '@/lib/chatHistoryMode';
 
 export const ChatHistoryPage = () => {
   const PAGE_TITLE = '利用履歴';
@@ -16,6 +17,26 @@ export const ChatHistoryPage = () => {
     .split(' ')
     .flatMap((q) => q.split('　'))
     .filter((q) => q !== '');
+
+  if (isChatHistoryDisabled) {
+    return (
+      <LayoutBody>
+        <PageTitle title={`${PAGE_TITLE}${APP_TITLE ? ` | ${APP_TITLE}` : ''}`} />
+        <div className='mx-auto p-6 max-w-(--page-width) lg:p-8'>
+          <BreadcrumbsNav
+            items={[{ label: 'ホーム', to: '/' }, { label: PAGE_TITLE }]}
+            className='mb-4'
+          />
+          <h1 className='mb-6 flex justify-start text-std-20B-160 lg:text-std-24B-150'>
+            {PAGE_TITLE}
+          </h1>
+          <p className='text-std-16N-170'>
+            この環境では、会話履歴を保存しない設定になっています。現在の会話はブラウザを更新したり、タブを閉じたりすると消えます。
+          </p>
+        </div>
+      </LayoutBody>
+    );
+  }
 
   return (
     <LayoutBody>

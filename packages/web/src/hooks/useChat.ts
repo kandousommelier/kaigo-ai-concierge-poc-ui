@@ -21,6 +21,7 @@ import {
 } from '@/features/kaigo/runtimeGuidance';
 import { TOP_CHAT_SYSTEM_PROMPT } from '@/features/landing/constants';
 import { createChat, createMessages, predictStream, predictTitle } from '@/lib/chatApi';
+import { isChatHistoryDisabled } from '@/lib/chatHistoryMode';
 import { getS3Uri } from '@/lib/fileApi';
 import { findModelByModelId, MODELS } from '@/models';
 import { getPrompter } from '../prompts';
@@ -577,6 +578,10 @@ const useChatStore = create<{
 
     setLoading(id, false);
 
+    if (isChatHistoryDisabled) {
+      return;
+    }
+
     const chatId = await createChatIfNotExist(id, get().chats[id].chat);
 
     // タイトルが空文字列だった場合、タイトルを予測して設定
@@ -767,13 +772,17 @@ export const useChat = (id: string, chatId?: string) => {
   const { mutate: mutateChatList } = useChatList();
 
   useEffect(() => {
-    // 新規チャットの場合
-    if (!chatId) {
+    // 新規チャット、または履歴を保存しないモードの場合
+    if (!chatId || isChatHistoryDisabled) {
       init(id);
     }
   }, [init, id, chatId]);
 
   useEffect(() => {
+    if (isChatHistoryDisabled) {
+      return;
+    }
+
     // 登録済みのチャットの場合
     if (!isLoadingMessage && messagesData && !isLoadingChat && chatData) {
       restore(id, messagesData.messages, chatData.chat);
@@ -795,7 +804,7 @@ export const useChat = (id: string, chatId?: string) => {
     setLoading: (newLoading: boolean) => {
       setLoading(id, newLoading);
     },
-    loadingMessages: isLoadingMessage,
+    loadingMessages: isChatHistoryDisabled ? false : isLoadingMessage,
     init: () => {
       init(id);
     },

@@ -11,6 +11,7 @@ import {
   updateTitle,
 } from '@/lib/chatApi';
 import { genUApiFetcher } from '@/lib/fetcher';
+import { isChatHistoryDisabled } from '@/lib/chatHistoryMode';
 
 export const useChatApi = () => {
   return {
@@ -19,6 +20,10 @@ export const useChatApi = () => {
     deleteChat,
     listChats: () => {
       const getKey = (pageIndex: number, previousPageData: ListChatsResponse) => {
+        if (isChatHistoryDisabled) {
+          return null;
+        }
+
         if (previousPageData && !previousPageData.lastEvaluatedKey) {
           return null;
         }
@@ -35,13 +40,12 @@ export const useChatApi = () => {
       });
     },
     findChatById: (chatId?: string) => {
-      return useSWR<FindChatByIdResponse>(chatId ? `chats/${chatId}` : null, genUApiFetcher);
+      const key = chatId && !isChatHistoryDisabled ? `chats/${chatId}` : null;
+      return useSWR<FindChatByIdResponse>(key, genUApiFetcher);
     },
     listMessages: (chatId?: string) => {
-      return useSWR<ListMessagesResponse>(
-        chatId ? `chats/${chatId}/messages` : null,
-        genUApiFetcher,
-      );
+      const key = chatId && !isChatHistoryDisabled ? `chats/${chatId}/messages` : null;
+      return useSWR<ListMessagesResponse>(key, genUApiFetcher);
     },
     updateTitle,
     predict,

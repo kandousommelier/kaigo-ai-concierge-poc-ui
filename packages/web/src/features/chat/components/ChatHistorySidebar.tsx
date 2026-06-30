@@ -3,11 +3,16 @@ import { Button } from '@/components/ui/dads/Button';
 import { linkDefaultStyle } from '@/components/ui/dads/Link';
 import { decomposeId } from '@/utils/decomposeId';
 import { formatDateTime } from '@/utils/formatDateTime';
+import { isChatHistoryDisabled } from '@/lib/chatHistoryMode';
 import { useChatHistorySidebar } from '../hooks/useChatHistorySidebar';
 
 export const ChatHistorySidebar = () => {
   const { displayedChats, isLoading } = useChatHistorySidebar();
   const { chatId } = useParams();
+
+  if (isChatHistoryDisabled) {
+    return null;
+  }
 
   const isInitialLoading = isLoading && displayedChats.length === 0;
   const isEmpty = !isLoading && displayedChats.length === 0;

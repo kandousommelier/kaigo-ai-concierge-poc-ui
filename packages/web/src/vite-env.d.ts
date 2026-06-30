@@ -27,6 +27,7 @@ interface ImportMetaEnv {
   readonly VITE_APP_HIDE_MODEL_IDS_FROM_USERS?: string;
   readonly VITE_APP_AI_PROVIDER?: string;
   readonly VITE_APP_KAIGO_API_ENDPOINT?: string;
+  readonly VITE_APP_CHAT_HISTORY_MODE?: string;
 }
 
 interface ImportMeta {

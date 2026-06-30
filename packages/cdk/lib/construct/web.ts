@@ -58,6 +58,7 @@ export interface WebProps {
   kaigoAiReleasePaused: boolean;
   hideModelIdsFromUsers: boolean;
   aiProvider: string;
+  chatHistoryMode: string;
   maintenance: boolean;
 }
 
@@ -346,6 +347,7 @@ function handler(event) {
         VITE_APP_KAIGO_AI_RELEASE_PAUSED: props.kaigoAiReleasePaused.toString(),
         VITE_APP_HIDE_MODEL_IDS_FROM_USERS: props.hideModelIdsFromUsers.toString(),
         VITE_APP_AI_PROVIDER: props.aiProvider,
+        VITE_APP_CHAT_HISTORY_MODE: props.chatHistoryMode,
       },
     });
 

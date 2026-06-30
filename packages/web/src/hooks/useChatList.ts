@@ -2,6 +2,7 @@ import { Chat } from 'genai-web';
 import { produce } from 'immer';
 import { useChatApi } from './useChatApi';
 import { usePagination } from './usePagination';
+import { isChatHistoryDisabled } from '@/lib/chatHistoryMode';
 
 export const useChatList = () => {
   const { listChats, deleteChat: deleteChatApi, updateTitle } = useChatApi();
@@ -71,6 +72,19 @@ export const useChatList = () => {
       return null;
     }
   };
+
+  if (isChatHistoryDisabled) {
+    return {
+      loading: false,
+      chats: [],
+      mutate,
+      updateChatTitle,
+      deleteChat,
+      getChatTitle: () => null,
+      canLoadMore: false,
+      loadMore: () => {},
+    };
+  }
 
   return {
     loading: isLoading,
