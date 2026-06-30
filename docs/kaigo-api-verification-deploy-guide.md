@@ -45,6 +45,8 @@ Web側には、CDKから以下の値が渡る想定です。
 
 `kaigoAiReleasePaused=false` は、施設配布再開を意味しないように扱ってください。検証環境で、検証担当者がAPI疎通と画面挙動を確認する場合に限り、事前承認のうえで一時的に使います。
 
+`kaigoApiOpenAiSecretArn` と `kaigoApiSystemPromptSecretArn` には、AWS Secrets Managerが表示する完全ARNを使います。Secret名だけ、または末尾のランダム6文字を含まないARNは使わないでください。
+
 ## Secrets Managerに登録するもの
 
 ### OpenAI APIキー
@@ -122,8 +124,9 @@ npm -w packages/cdk run cdk -- diff --all -c env=<検証環境キー>
 6. CloudFrontのWeb画面を開く
 7. Cognitoで検証用アカウントにログインする
 8. `VITE_APP_AI_PROVIDER=kaigo_api` と `VITE_APP_KAIGO_API_ENDPOINT` が反映されていることを確認する
-9. 検証担当者だけでチャット疎通を確認する
-10. CloudWatch、Cost Explorer、OpenAI利用量を確認する
+9. ブラウザのNetworkで `POST /api/chat/stream` に送信されることを確認する
+10. 検証担当者だけでチャット疎通を確認する
+11. CloudWatch、Cost Explorer、OpenAI利用量を確認する
 
 施設向け本番配布は、この検証が完了するまで再開しません。
 
@@ -134,17 +137,29 @@ npm -w packages/cdk run cdk -- diff --all -c env=<検証環境キー>
 - Cognitoログインできる
 - ブラウザのNetworkで `Authorization` ヘッダーが付いている
 - `VITE_APP_KAIGO_API_ENDPOINT` の `kaigo_api` に到達している
+- 送信先が `POST /api/chat/stream` になっている
 - 認証切れの場合に 401 / 403 として扱われる
 - Cognito認証失敗時にCORS errorだけに見えない
 
 ### 入力とプロンプト保護
 
-- フロントから `system` role を送っても拒否される
+- フロントから `system` role を送らない
+- 意図的に `system` role を送る検証ではLambda側で拒否される
 - フロントからSYSTEM_PROMPT本文を送っていない
 - フロントへSYSTEM_PROMPT本文が返っていない
 - `modelId` や `llmType` を `kaigo_api` へ送っていない
+- Bedrock向け `model` を `kaigo_api` へ送っていない
+- payloadが `mode`, `messages`, `usecase`, `clientRequestId` のみに絞られている
+- `messages` が `user` / `assistant` role と `content` のみに絞られている
 - 入力サイズ制限が効く
 - 大きすぎる入力で本文をログに出さず400系エラーになる
+
+### ストリーミング表示
+
+- Lambdaから返るNDJSON `{ "text": "..." }` が画面に表示される
+- API Gateway Lambda proxy構成では完全な逐次配信にならない可能性がある
+- まずは非逐次NDJSON風レスポンスで検証する
+- 本番前にトークン単位の逐次表示が必要な場合は、Lambda response streaming等を検討する
 
 ### 会話ログ保存なし
 
@@ -180,9 +195,12 @@ CloudWatch Logsに以下が出ていないことを確認します。
 - 401 / 403: 認証切れ、再ログイン案内
 - 429: 利用集中、時間を置いて再試行する案内
 - 500系: 一時的な障害案内
+- 501: `kaigo_api` には到達したがOpenAI接続が未有効である案内
 - Secret未設定: 検証担当者向けに設定不足と分かる案内
 - system role混入: 不正な入力として扱う
 - CORS: 認証失敗やAPI GatewayエラーがCORS errorだけに見えない
+
+現在の `Access-Control-Allow-Origin: *` は検証用の扱いです。本番ではCloudFront Origin等に絞るか、施設配布前に判断してください。
 
 ### OpenAI利用量と費用
 
