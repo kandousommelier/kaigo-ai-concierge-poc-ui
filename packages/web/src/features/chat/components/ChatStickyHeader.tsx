@@ -33,7 +33,7 @@ export const ChatStickyHeader = (props: Props) => {
             </p>
             <ChatNotificationDialogButton className='shrink-0' onClick={onOpenNotificationDialog} />
           </div>
-          <div className='border-b border-b-solid-gray-800 pb-2 text-std-14N-160 text-solid-gray-800'>
+          <div className='break-words border-b border-b-solid-gray-800 pb-2 text-std-14N-160 text-solid-gray-800 [overflow-wrap:anywhere]'>
             {KAIGO_CHAT_NOTICE.map((notice) => (
               <p key={notice}>{notice}</p>
             ))}

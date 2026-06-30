@@ -21,6 +21,10 @@ import { AttachmentIcon } from '@/components/ui/icons/AttachmentIcon';
 import { SendIcon } from '@/components/ui/icons/SendIcon';
 import { LoadingButton } from '@/components/ui/LoadingButton';
 import { useChatStore } from '@/features/chat/stores/useChatStore';
+import {
+  KAIGO_AI_RELEASE_PAUSED,
+  KAIGO_AI_RELEASE_PAUSED_MESSAGE,
+} from '@/features/kaigo/constants';
 import { useChat } from '@/hooks/useChat';
 import { useFiles } from '@/hooks/useFiles';
 import { isSubmitKey } from '@/utils/keyboard';
@@ -110,7 +114,7 @@ export const ChatInput = (props: Props) => {
   };
 
   const [fileErrorMessage, setFileErrorMessage] = useState('');
-  const disabledSend = loading;
+  const disabledSend = loading || KAIGO_AI_RELEASE_PAUSED;
 
   useEffect(() => {
     if (errorMessages.length === 0) {
@@ -152,6 +156,11 @@ export const ChatInput = (props: Props) => {
             ? '介護現場の業務改善やICT活用について相談してみましょう'
             : '追加で相談したいことを入力してください'}
         </h2>
+        {KAIGO_AI_RELEASE_PAUSED && (
+          <p className='mb-2 rounded-8 border border-solid-gray-420 bg-solid-gray-50 p-3 text-std-16N-170 text-solid-gray-800'>
+            {KAIGO_AI_RELEASE_PAUSED_MESSAGE}
+          </p>
+        )}
         <div className='relative flex items-end bg-white'>
           <div className='flex w-full flex-col gap-2'>
             <AutoResizeTextarea
@@ -159,7 +168,12 @@ export const ChatInput = (props: Props) => {
               className='resize-none'
               rows={isInitialChat ? 3 : 1}
               required
-              placeholder=''
+              disabled={KAIGO_AI_RELEASE_PAUSED}
+              placeholder={
+                isInitialChat
+                  ? '例）ICTを導入しましたが、一部の職員しか使っていません。どこから見直せばよいですか。'
+                  : '追加で相談したいことを入力してください'
+              }
               aria-labelledby='chat-input-heading'
               aria-describedby='chat-input-error chat-input-file-error'
               onPaste={fileUpload ? handlePaste : undefined}

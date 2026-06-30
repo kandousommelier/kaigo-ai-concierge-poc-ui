@@ -15,6 +15,11 @@ import { produce } from 'immer';
 import { useEffect, useMemo } from 'react';
 import { SWRInfiniteKeyedMutator } from 'swr/infinite';
 import { createWithEqualityFn as create } from 'zustand/traditional';
+import {
+  getKaigoRuntimeGuidance,
+  KAIGO_RUNTIME_GUIDANCE_DISCLOSURE_RULE,
+} from '@/features/kaigo/runtimeGuidance';
+import { TOP_CHAT_SYSTEM_PROMPT } from '@/features/landing/constants';
 import { createChat, createMessages, predictStream, predictTitle } from '@/lib/chatApi';
 import { getS3Uri } from '@/lib/fileApi';
 import { findModelByModelId, MODELS } from '@/models';
@@ -34,6 +39,51 @@ export type GenerateOptions = {
   overrideModelType?: Model['type'];
   setSessionId?: (sessionId: string) => void;
   base64Cache?: Record<string, string>;
+};
+
+const isKaigoChatContext = (id: string, systemContext: string) => {
+  return (
+    id === '/chat' ||
+    id.startsWith('/chat/') ||
+    systemContext.includes('介護現場AIコンシェルジュ')
+  );
+};
+
+const appendKaigoRuntimeGuidance = (
+  id: string,
+  messages: ShownMessage[],
+): ShownMessage[] => {
+  const systemMessageIndex = messages.findIndex((message) => message.role === 'system');
+
+  if (systemMessageIndex < 0) {
+    return messages;
+  }
+
+  const systemContext = messages[systemMessageIndex].content;
+
+  if (!isKaigoChatContext(id, systemContext)) {
+    return messages;
+  }
+
+  const latestUserMessage = [...messages].reverse().find((message) => message.role === 'user');
+  const runtimeGuidance = getKaigoRuntimeGuidance(latestUserMessage?.content ?? '');
+
+  if (!runtimeGuidance) {
+    return messages;
+  }
+
+  const systemGuidance = `${KAIGO_RUNTIME_GUIDANCE_DISCLOSURE_RULE}\n\n${runtimeGuidance}`;
+
+  return messages.map((message, index) => {
+    if (index === systemMessageIndex) {
+      return {
+        ...message,
+        content: `${message.content.trimEnd()}\n\n${systemGuidance}`,
+      };
+    }
+
+    return message;
+  });
 };
 
 const useChatStore = create<{
@@ -83,6 +133,14 @@ const useChatStore = create<{
     return get().modelIds[id] || '';
   };
 
+  const getDefaultSystemContext = (id: string, modelId: string) => {
+    if (id === '/chat' || id.startsWith('/chat/')) {
+      return TOP_CHAT_SYSTEM_PROMPT;
+    }
+
+    return getPrompter(modelId).systemContext(id);
+  };
+
   const setModelId = (id: string, newModelId: string) => {
     set((state) => {
       return {
@@ -90,15 +148,14 @@ const useChatStore = create<{
           ...state.modelIds,
           [id]: newModelId,
         },
-        // モデル変更時は systemContext を新モデル用 prompter に追随させる
+        // モデル変更時は systemContext を新しい既定プロンプトに追随させる
         // ただし登録済みチャット（chat.chat あり）は保存時の systemContext を尊重して更新しない
         chats: produce(state.chats, (draft) => {
           const chat = draft[id];
           if (!chat || chat.chat) {
             return;
           }
-          const prompter = getPrompter(newModelId);
-          const systemContext = prompter.systemContext(id);
+          const systemContext = getDefaultSystemContext(id, newModelId);
           const idx = chat.messages.findIndex((m) => m.role === 'system');
           if (idx > -1) {
             chat.messages[idx].content = systemContext;
@@ -135,8 +192,7 @@ const useChatStore = create<{
   };
 
   const initChatWithSystemContext = (id: string) => {
-    const prompter = getPrompter(getModelId(id));
-    const systemContext = prompter.systemContext(id);
+    const systemContext = getDefaultSystemContext(id, getModelId(id));
 
     initChat(id, [{ role: 'system', content: systemContext }], undefined);
   };
@@ -438,6 +494,8 @@ const useChatStore = create<{
     if (preProcessInput) {
       inputMessages = preProcessInput(inputMessages);
     }
+
+    inputMessages = appendKaigoRuntimeGuidance(id, inputMessages);
 
     // LLM へのリクエスト
     const formattedMessages = formatMessageProperties(

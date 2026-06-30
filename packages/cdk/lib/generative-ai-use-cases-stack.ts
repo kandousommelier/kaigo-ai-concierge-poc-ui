@@ -300,6 +300,9 @@ export class GenerativeAiUseCasesStack extends Stack {
       govais_for_homepage: params.govais_for_homepage,
       topChatSystemPrompt: params.top_chat_system_prompt,
       topChatSystemPromptTitle: params.top_chat_system_prompt_title,
+      kaigoAiReleasePaused: params.kaigoAiReleasePaused,
+      hideModelIdsFromUsers: params.hideModelIdsFromUsers,
+      aiProvider: params.aiProvider,
       // Custom Domain
       cert: props.cert,
       hostName: params.hostName,

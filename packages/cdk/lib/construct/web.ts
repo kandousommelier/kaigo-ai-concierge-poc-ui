@@ -55,6 +55,9 @@ export interface WebProps {
   govais_for_homepage: z.infer<typeof govaiForHomepage>[];
   topChatSystemPrompt: string;
   topChatSystemPromptTitle: string;
+  kaigoAiReleasePaused: boolean;
+  hideModelIdsFromUsers: boolean;
+  aiProvider: string;
   maintenance: boolean;
 }
 
@@ -340,6 +343,9 @@ function handler(event) {
         VITE_APP_GOVAIS_FOR_HOMEPAGE: JSON.stringify(props.govais_for_homepage),
         VITE_APP_TOP_CHAT_SYSTEM_PROMPT: props.topChatSystemPrompt,
         VITE_APP_TOP_CHAT_SYSTEM_PROMPT_TITLE: props.topChatSystemPromptTitle,
+        VITE_APP_KAIGO_AI_RELEASE_PAUSED: props.kaigoAiReleasePaused.toString(),
+        VITE_APP_HIDE_MODEL_IDS_FROM_USERS: props.hideModelIdsFromUsers.toString(),
+        VITE_APP_AI_PROVIDER: props.aiProvider,
       },
     });
 

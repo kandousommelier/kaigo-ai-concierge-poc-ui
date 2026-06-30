@@ -115,6 +115,9 @@ export const stackInputSchema = z
     govais_for_homepage: z.array(govaiForHomepage).default([]),
     top_chat_system_prompt: z.string().default(''),
     top_chat_system_prompt_title: z.string().default(''),
+    kaigoAiReleasePaused: z.boolean().default(true),
+    hideModelIdsFromUsers: z.boolean().default(true),
+    aiProvider: z.string().default('bedrock'),
 
     // API
     modelRegion: z.string().default('ap-northeast-1'),

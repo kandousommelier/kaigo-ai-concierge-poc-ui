@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router';
 import { useChatStore } from '@/features/chat/stores/useChatStore';
+import { KAIGO_AI_RELEASE_PAUSED } from '@/features/kaigo/constants';
 import { useChat } from '@/hooks/useChat';
 import { useFiles } from '@/hooks/useFiles';
 import { usePrompter } from '@/hooks/usePrompter';
@@ -36,6 +37,10 @@ export const useChatSubmit = ({
   const currentSystemContext = getCurrentSystemContext();
 
   const onSend = useCallback(() => {
+    if (KAIGO_AI_RELEASE_PAUSED) {
+      return;
+    }
+
     if (inputSystemContext !== currentSystemContext) {
       updateSystemContext(inputSystemContext);
     }
@@ -62,6 +67,11 @@ export const useChatSubmit = ({
   ]);
 
   useEffect(() => {
+    if (KAIGO_AI_RELEASE_PAUSED) {
+      setShouldAutoSubmit(false);
+      return;
+    }
+
     if (shouldAutoSubmit && content && inputSystemContext && !loading) {
       onSend();
       setShouldAutoSubmit(false);

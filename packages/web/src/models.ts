@@ -20,6 +20,9 @@ const imageGenModelIds: string[] = (
   .map((name: string) => name.trim())
   .filter((name: string) => name);
 
+const shouldHideModelIdsFromUsers =
+  import.meta.env.VITE_APP_HIDE_MODEL_IDS_FROM_USERS?.trim().toLowerCase() !== 'false';
+
 const textModels = [
   ...bedrockModelIds.map((name) => ({ modelId: name, type: 'bedrock' }) as Model),
   ...endpointNames.map((name) => ({ modelId: name, type: 'sagemaker' }) as Model),
@@ -37,6 +40,10 @@ export const findModelByModelId = (modelId: string) => {
 };
 
 export const findModelDisplayNameByModelId = (modelId: string): string => {
+  if (shouldHideModelIdsFromUsers) {
+    return 'AI相談機能';
+  }
+
   let displayName = modelMetadata[modelId]?.displayName ?? modelId;
   if (duplicateBaseModelIds.has(modelId.replace(CRI_PREFIX_PATTERN, ''))) {
     const matched = modelId.match(CRI_PREFIX_PATTERN);

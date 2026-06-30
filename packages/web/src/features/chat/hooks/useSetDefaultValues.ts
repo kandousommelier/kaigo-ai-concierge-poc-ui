@@ -24,7 +24,7 @@ export const useSetDefaultValues = (systemContextList: SystemContext[]) => {
   } = useChatStore();
   const { pathname, search, state } = useLocation();
   const { chatId } = useParams();
-  const { getModelId, setModelId, clear, getCurrentSystemContext, updateSystemContext } = useChat(
+  const { getModelId, setModelId, getCurrentSystemContext, updateSystemContext } = useChat(
     pathname,
     chatId,
   );
@@ -72,20 +72,21 @@ export const useSetDefaultValues = (systemContextList: SystemContext[]) => {
 
     // state または query params から content と systemContext を取得
     const content = locationState?.content ?? params.content ?? '';
-    const systemContext = locationState?.systemContext ?? params.systemContext;
+    const systemContext = locationState?.systemContext?.trim() || params.systemContext?.trim();
     const autoSubmit = locationState?.autoSubmit ?? params.autoSubmit === 'true';
+    const nextModelId = availableModels.includes(params.modelId ?? '')
+      ? params.modelId!
+      : defaultModelId;
 
-    if (systemContext && systemContext !== '') {
-      updateSystemContext(systemContext);
-      setInputSystemContext(systemContext);
-      setSystemContextTitle(locationState?.systemContextTitle ?? '');
-    } else {
-      clear();
-      setInputSystemContext(getCurrentSystemContext());
-    }
-
+    setModelId(nextModelId);
+    updateSystemContext(systemContext || TOP_CHAT_SYSTEM_PROMPT);
+    setInputSystemContext(systemContext || TOP_CHAT_SYSTEM_PROMPT);
+    setSystemContextTitle(
+      systemContext
+        ? (locationState?.systemContextTitle ?? '')
+        : TOP_CHAT_SYSTEM_PROMPT_TITLE,
+    );
     setContent(content);
-    setModelId(availableModels.includes(params.modelId ?? '') ? params.modelId! : defaultModelId);
     const shouldSubmit = autoSubmit && !!content.trim();
     setShouldAutoSubmit(shouldSubmit);
     setHasSent(shouldSubmit);
